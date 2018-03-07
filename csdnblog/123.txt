@@ -1,0 +1,198 @@
+标题: Scrapy简明教程(二)——开启Scrapy爬虫项目之旅
+博文链接: http://blog.csdn.net/oscer2016/article/details/78007472
+发布时间: 2017年09月16日 23:09:11
+
+正文: 
+                        1. 启动项目:
+
+  安装好 Scrapy 以后， 我们可以运行 startproject 命令生成该项目的默认结构。具体步骤为: 打开终端进入想要存储 Scrapy 项目的目录，然后运行 scrapy startproject <project name>。这里我们用 FirstProject作为项目名:
+
+
+
+scrapy startproject FirstProject
+
+
+
+以下是 scrapy 命令生成的文件结构:
+
+
+
+FirstProject/
+├── FirstProject
+│   ├── __init__.py
+│   ├── items.py
+│   ├── middlewares.py
+│   ├── pipelines.py
+│   ├── settings.py
+│   └── spiders
+│       └── __init__.py
+└── scrapy.cfg
+
+其中比较重要的几个文件如下所示:
+
+scrapy.cfg: 项目配置文件。 
+settings.py: 该文件定义了一些设置，如用户代理，爬取延时等(详见: https://doc.scrapy.org/en/latest/topics/settings.html)。 
+items.py: 该文件定义了待抓取域的模型(详见: http://scrapy-chs.readthedocs.io/zh_CN/latest/intro/tutorial.html#item)。 
+pipelines.py: 该文件定义了数据的存储方式(处理要抓取的域)，可以是文件，数据库或者其他(详见: http://scrapy-chs.readthedocs.io/zh_CN/latest/topics/item-pipeline.html)。 
+middlewares.py: 爬虫中间件，该文件可定义随机切换ip或者用户代理的函数(详见: http://scrapy-chs.readthedocs.io/zh_CN/latest/topics/spider-middleware.html)。 
+spiders: 该目录下存储实际的爬虫代码(详见: http://scrapy-chs.readthedocs.io/zh_CN/latest/topics/spiders.html)。
+
+
+使用 scrapy startproject 来创建爬虫项目，在创建的时候我们也可以加上一些参数进行控制， 所有参数如下:
+
+
+
+scrapy startproject -h
+
+
+
+下面对几个重要的参数进行介绍:
+
+(1) –logfile=FILE: 用来指定日志文件名及其存放位置，用法如下:
+
+scrapy startproject --logfile="日志文件的路径地址" FirstProject
+
+(2) –loglevel=LEVEL, -L LEVEL: 控制日志信息的等级，默认为 DEBUG 模式，即会将对应的调试信息都输出。用法及日志的常见等级如下:
+
+scrapy startproject --loglevel=ERROR FirstProject
+或 scrapy startproject -L ERROR FirstProject
+
+Scrapy 提供 5 层 logging 级别:
+
+
+
+
+            等级名
+      含义
+
+
+
+  CRITICAL
+  严重错误(critical)
+
+
+  ERROR
+  一般错误(regular errors)
+
+
+  WARNING
+  警告信息(warning messages)
+
+
+  INFO
+  一般信息(informational messages)
+
+
+  DEBUG
+  调试信息(debugging messages)，常用于开发阶段
+
+
+
+
+
+(3) –nolog: 不输出日志信息，用法如下:
+
+scrapy startproject FirstProject --nolog
+
+2. Scrapy 常用工具命令:
+
+
+
+scrapy -h
+
+
+
+
+以下对几个比较常用的命令进行介绍:
+
+(1) genspider: 
+
+用法: 
+
+
+
+scrapy genspider [-t template] <name> <domain>
+
+介绍: 这仅仅是创建 spider 的一种快捷方法，该方法可以使用提前定义好的模板来生成 spider, 您也可以自己创建spider的源码文件。
+
+Scrapy 提供的模板可用如下命令查看: 
+
+
+
+scrapy genspider -l
+
+
+
+
+创建爬虫示例:
+
+# 先切换进项目目录，然后用提前定义好的模板生成爬虫文件
+cd FirstProject/
+scrapy genspider -t basic spider_csdn csdn.net
+
+
+
+先来看一下用 basic 模板创建好的爬虫文件:
+
+
+
+然后对这个爬虫文件进行简单的修改，具体的数据提取将在下一篇博客进行介绍，这里只是演示它的运行效果:
+
+# -*- coding: utf-8 -*-
+
+import scrapy
+
+
+class SpiderCsdnSpider(scrapy.Spider):
+    name = 'spider_csdn'
+    allowed_domains = ['csdn.net']
+    start_urls = ['http://www.csdn.net/']
+
+    def parse(self, response):
+        print response.url  # 打印当前爬取的链接
+        print response.body # 打印当前爬取网页的源代码
+
+(2) list:
+
+用法: 
+
+
+
+scrapy list
+
+
+
+介绍: 列出当前项目中所有可用的 spider，每行输出一个 spider。
+
+(3) crawl:
+
+用法:
+
+
+
+scrapy crawl <spider> [loglevel]
+
+
+
+介绍: 使用 spider 进行爬取。
+
+示例:
+
+
+
+(4) shell:
+
+用法: 
+
+
+
+scrapy shell [url]
+
+介绍: 以给定的 URL (如果给出)或者空(没有给出 URL)启动 Scrapy shell，查看  Scrapy终端(Scrapy shell) 获取更多信息。
+
+示例:
+
+
+
+Note:  
+  命令行工具 shell 常用于测试数据抽取是否正确，对于复杂的网页，有时需要多次修改数据抽取表达式(比如 xpath表达式)，如果每修改一次都重新运行整个项目的话，会很耗时，而用 shell 这个命令就会很方便，测试正确了再写入爬虫文件，这样会大大提高开发效率。                

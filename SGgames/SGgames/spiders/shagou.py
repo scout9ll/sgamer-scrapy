@@ -13,7 +13,7 @@ class ShagouSpider(scrapy.Spider):
 
     def parse(self, response):
 
-        for i in range(5):
+        for i in range(20):
             url = 'https://bbs.sgamer.com/forum-44-%d.html' % (i + 1)
             yield Request(url=url, callback=self.get_urls)
 
